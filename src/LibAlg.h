@@ -1,5 +1,9 @@
 #pragma once
 
+#if __cplusplus >= 201103L
+#include <initializer_list>
+#endif
+
 namespace LA
 {
 
@@ -33,6 +37,22 @@ public:
             mem[i] = starting_data[i];
         }
     };
+#if __cplusplus >= 201103L
+    Array(std::initializer_list<elem_t> list)
+    {
+        rows = list.size();
+        cols = 1;
+        size = rows;
+        mem = new elem_t[size];
+
+        int i = 0;
+        for (auto it : list)
+        {
+            mem[i] = it;
+            i++;
+        }
+    };
+#endif
     Array(const Array<elem_t> &rhs)
     {
         rows = rhs.rows;
@@ -67,7 +87,7 @@ public:
 
         return *this;
     }
-    Array<elem_t> & operator=(const elem_t *arr)
+    Array<elem_t> & operator=(const elem_t arr[])
     {
         for (int i = 0; i < size; i++)
         {
@@ -87,16 +107,38 @@ class Matrix
 public:
     typedef MemT mem_t;
     typedef typename MemT::elem_t data_t;
+    
+    int rows, cols;
     mem_t mem;
 
-    int rows, cols;
+    Matrix(int _rows, int _cols) : rows(_rows), cols(_cols), mem(_rows, _cols) {};
+    Matrix(const Matrix<MemT> &rhs) : rows(rhs.rows), cols(rhs.cols), mem(rhs.mem) {};
+#if __cplusplus >= 201103L
+    Matrix(std::initializer_list<std::initializer_list<data_t>> list) : Matrix(list.size(), list.begin()->size())
+    {
+        int i = 0;
+        int j = 0;
+        for (auto it : list)
+        {
+            for(auto it2 : it)
+            {
+                mem(i, j) = it2;
+                j++;
+            }
+            j = 0;
+            i++;
+        }
+    }
+#endif
 
-    Matrix(int _rows, int _cols) : mem(_rows, _cols), rows(_rows), cols(_cols) {};
-
-    Matrix<mem_t> & operator=(const data_t *arr)
+    Matrix<mem_t> & operator=(const data_t arr[])
     {
         mem = arr;
 
+        return *this;
+    }
+    Matrix<mem_t> & operator=(const data_t val)
+    {
         return *this;
     }
 
@@ -338,5 +380,8 @@ public:
         return IA;
     }
 };
+
+using FloatArray = Array<float>;
+using FloatMatrix = Matrix<FloatArray>;
 
 }
