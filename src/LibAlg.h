@@ -97,6 +97,8 @@ public:
         return *this;
     }
 
+    elem_t & operator[](int index) { return mem[index]; }
+    elem_t operator[](int index) const { return mem[index]; }
     elem_t & operator()(int row, int col = 0) { return mem[row * cols + col]; };
     elem_t operator()(int row, int col = 0) const { return mem[row * cols + col]; };
 };
